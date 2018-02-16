@@ -1,2 +1,2 @@
-# DVP-FacebookReceiver
-facebook post receiver for public host
+# DVP-SocialConnector
+Social media connector for twitter and facebook

@@ -1,0 +1,46 @@
+{
+  "name": "dvp-socialconnector",
+  "version": "1.0.0",
+  "description": "Social media connector for twitter and facebook",
+  "main": "app.js",
+  "dependencies": {
+    "amqp": "^0.2.6",
+    "async": "^2.1.4",
+    "config": "^1.21.0",
+    "dustjs-linkedin": "^2.7.3",
+    "dvp-common": "1.1.0",
+    "dvp-mongomodels": "^5.0.14",
+    "fbgraph": "^1.2.0",
+    "form-data": "^2.2.0",
+    "format": "^0.2.2",
+    "fs": "0.0.2",
+    "juice": "^2.0.0",
+    "moment": "^2.14.1",
+    "mongoose": "^4.5.4",
+    "mongoose-unique-validator": "^1.0.2",
+    "node-uuid": "^1.4.7",
+    "oauth": "^0.9.14",
+    "querystring": "^0.2.0",
+    "request": "^2.79.0",
+    "restify": "^4.1.1",
+    "restify-jwt": "^0.4.0",
+    "smpp": "^0.3.1",
+    "stringformat": "^0.0.5",
+    "twitter": "^1.3.0",
+    "validator": "^5.5.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DuoSoftware/DVP-SocialConnector.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DuoSoftware/DVP-SocialConnector/issues"
+  },
+  "homepage": "https://github.com/DuoSoftware/DVP-SocialConnector#readme"
+}
