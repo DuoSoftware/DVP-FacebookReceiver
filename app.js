@@ -9,9 +9,9 @@ restify.CORS.ALLOW_HEADERS.push('authorization');
 // Setup some https server options
 
 var https_options = {
-    ca: fs.readFileSync('/etc/ssl/fb/COMODORSADomainValidationSecureServerCA.crt'),
+   /* ca: fs.readFileSync('/etc/ssl/fb/COMODORSADomainValidationSecureServerCA.crt'),
     key: fs.readFileSync('/etc/ssl/fb/SSL1.txt'),
-    certificate: fs.readFileSync('/etc/ssl/fb/STAR_duoworld_com.crt')
+    certificate: fs.readFileSync('/etc/ssl/fb/STAR_duoworld_com.crt')*/
 };
 
 var https_server = restify.createServer(https_options);
