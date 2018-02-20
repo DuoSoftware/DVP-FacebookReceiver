@@ -18,8 +18,61 @@ var CreateEngagement = require('../Workers/common').CreateEngagement;
 var RegisterCronJob = require('../Workers/common').RegisterCronJob;
 var validator = require('validator');
 var format = require("stringformat");
+var util = require('util');
 /*var authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkdW9vd25lciIsImp0aSI6IjI1NmZhMjNiLTQ3YTAtNDU0NS05ZGYxLTAxMWIwZDdjYWViOSIsInN1YiI6IkFjY2VzcyBjbGllbnQiLCJleHAiOjIwNjg1ODA5MjIsInRlbmFudCI6MSwiY29tcGFueSI6MTAzLCJhdWQiOiJteWFwcCIsImNvbnRleHQiOnt9LCJzY29wZSI6W3sicmVzb3VyY2UiOiJ0aWNrZXQiLCJhY3Rpb25zIjpbInJlYWQiLCJ3cml0ZSIsImRlbGV0ZSJdfSx7InJlc291cmNlIjoic2xhIiwiYWN0aW9ucyI6WyJyZWFkIiwid3JpdGUiLCJkZWxldGUiXX0seyJyZXNvdXJjZSI6InRyaWdnZXJzIiwiYWN0aW9ucyI6WyJyZWFkIiwid3JpdGUiLCJkZWxldGUiXX1dLCJpYXQiOjE0Njc5NzYxMjJ9.05YMBXY5PgTJZpY6qJA0YVgeXtND0aMiCU85fvOvDJc";*/
 var authorization;
+
+var mongoip = config.Mongo.ip;
+var mongoport = config.Mongo.port;
+var mongodb = config.Mongo.dbname;
+var mongouser = config.Mongo.user;
+var mongopass = config.Mongo.password;
+var mongoreplicaset=config.Mongo.replicaset;
+
+
+var mongoose = require('mongoose');
+var connectionstring = '';
+mongoip = mongoip.split(',');
+if(util.isArray(mongoip)){
+ if(mongoip.length > 1){    
+    mongoip.forEach(function(item){
+        connectionstring += util.format('%s:%d,',item,mongoport)
+    });
+
+    connectionstring = connectionstring.substring(0, connectionstring.length - 1);
+    connectionstring = util.format('mongodb://%s:%s@%s/%s',mongouser,mongopass,connectionstring,mongodb);
+
+    if(mongoreplicaset){
+        connectionstring = util.format('%s?replicaSet=%s',connectionstring,mongoreplicaset) ;
+        logger.info("connectionstring ...   "+connectionstring);
+    }
+ }
+    else
+    {
+        connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip[0],mongoport,mongodb);
+    }
+}else {
+
+    connectionstring = util.format('mongodb://%s:%s@%s:%d/%s', mongouser, mongopass, mongoip, mongoport, mongodb);
+
+}
+logger.info("connectionstring ...   "+connectionstring);
+
+mongoose.connection.on('error', function (err) {
+    logger.error(err);
+});
+
+mongoose.connection.on('disconnected', function () {
+    logger.error('Could not connect to database');
+});
+
+mongoose.connection.once('open', function () {
+    logger.info("Connected to db");
+});
+
+
+mongoose.connect(connectionstring);
+
 
 module.exports.GetFacebookAccounts = function (req, res) {
     logger.info("DVP-SocialConnector.GetFacebookAccounts Internal method ");
@@ -871,7 +924,7 @@ module.exports.RealTimeUpdates = function (fbData) {
 
         items.changes.forEach(function (change) {
             /*if (change.value.sender_id.toString() === config.SocialConnector.owner_id){*/
-                if (ownerIds.indexOf(change.value.sender_id.toString()) === -1) {
+                if (ownerIds.indexOf(change.value.from.id.toString()) === -1) {
                     if (change.field == "feed") {
                         if (change.value.item == "status" || change.value.item == "post") {
                             // create ticket
