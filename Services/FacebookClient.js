@@ -924,7 +924,7 @@ module.exports.RealTimeUpdates = function (fbData) {
 
         items.changes.forEach(function (change) {
             /*if (change.value.sender_id.toString() === config.SocialConnector.owner_id){*/
-                if (ownerIds.indexOf(change.value.from.id.toString()) === -1) {
+                if (change&&change.value&&change.value.from&&(ownerIds.indexOf(change.value.from.id.toString()) === -1)) {
                     if (change.field == "feed") {
                         if (change.value.item == "status" || change.value.item == "post") {
                             // create ticket
@@ -960,18 +960,24 @@ var RealTimeComments = function (id, fbData) {
                 var tenant = parseInt(fbConnector.tenant);
 
 
+                // var to = {
+                //     "id": fbData.from.id,
+                //     "name": fbData.from.name
+                // };
+
+                var name = fbConnector.fb.firstName + " " + fbConnector.fb.lastName;
                 var to = {
                     "id": id,
-                    "name": fbData.firstName + " " + fbData.lastName
+                    "name": name
                 };
 
                 var user = {};
-                user.name = fbData.sender_name;
-                user.id = fbData.sender_id;
+                user.name = fbData.from.name;
+                user.id = fbData.from.id;
                 user.channel = 'facebook';
 
                 console.log("CreateEngagement");
-                CreateEngagement("facebook-post", company, tenant, fbData.sender_name, to.name, "inbound", fbData.comment_id, fbData.message, user, fbData.sender_id, to, function (isSuccess, engagement) {
+                CreateEngagement("facebook-post", company, tenant, fbData.from.name, to.name, "inbound", fbData.comment_id, fbData.message, user, fbData.from.id, to, function (isSuccess, engagement) {
                     console.log("CreateEngagement ......" +isSuccess);
                     if (isSuccess) {
                         console.log("CreateEngagement-------------- " + JSON.stringify(fbData));
@@ -1016,8 +1022,8 @@ var RealTimeCreateTicket = function (id, fbData) {
                 var tenant = parseInt(fbConnector.tenant);
 
                 var from = {
-                    "name": fbData.sender_name,
-                    "id": fbData.sender_id
+                    "id": fbData.from.id,
+                    "name": fbData.from.name
                 };
 
                 var name = fbConnector.fb.firstName + " " + fbConnector.fb.lastName;
@@ -1027,11 +1033,11 @@ var RealTimeCreateTicket = function (id, fbData) {
                 };
 
                 var user = {};
-                user.name = fbData.sender_name;
-                user.id = fbData.sender_id;
+                user.name = fbData.from.name;
+                user.id = fbData.from.id;
                 user.channel = 'facebook';
 
-                CreateEngagement("facebook-post", company, tenant, fbData.sender_name, to.name, "inbound", fbData.post_id, fbData.message, user, fbData.sender_id, to, function (isSuccess, engagement) {
+                CreateEngagement("facebook-post", company, tenant, fbData.from.name, to.name, "inbound", fbData.post_id, fbData.message, user, fbData.from.id, to, function (isSuccess, engagement) {
 
                     if (isSuccess) {
 
@@ -1055,7 +1061,7 @@ var RealTimeCreateTicket = function (id, fbData) {
                          "description": fbData.message,
                          "priority": "normal",
                          "status": "new",
-                         "requester": fbData.sender_id,
+                         "requester": fbData.from.id,
                          "engagement_session": engagement.engagement_id,
                          "channel": JSON.stringify(from),
                          "tags": ["facebook.post.common.common",name]
