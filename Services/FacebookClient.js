@@ -940,7 +940,7 @@ module.exports.RealTimeUpdates = function (fbData) {
                         }
                         else if (change.value.item == "comment") {
                             // add comment
-                            RealTimeComments(items.id, change.value,change.value,change.value.from.id.toString());
+                            RealTimeComments(items.id, change.value,change.value.from.id.toString());
                         }
                     }
 
