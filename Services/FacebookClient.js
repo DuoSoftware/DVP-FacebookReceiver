@@ -3,7 +3,6 @@
  */
 
 var request = require("request");
-var mongoose = require('mongoose');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var SocialConnector = require('dvp-mongomodels/model/SocialConnector').SocialConnector;
@@ -11,16 +10,12 @@ var async = require("async");
 var moment = require('moment');
 var config = require('config');
 var CreateTicket = require('../Workers/common').CreateTicket;
-var AddToRequest = require('../Workers/common').AddToRequest;
 var CreateComment = require('../Workers/common').CreateComment;
 var CreateEngagement = require('../Workers/common').CreateEngagement;
-/*var CreateTicket = require('../Workers/common').CreateTicket;*/
-var RegisterCronJob = require('../Workers/common').RegisterCronJob;
-var validator = require('validator');
 var format = require("stringformat");
 var util = require('util');
-/*var authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkdW9vd25lciIsImp0aSI6IjI1NmZhMjNiLTQ3YTAtNDU0NS05ZGYxLTAxMWIwZDdjYWViOSIsInN1YiI6IkFjY2VzcyBjbGllbnQiLCJleHAiOjIwNjg1ODA5MjIsInRlbmFudCI6MSwiY29tcGFueSI6MTAzLCJhdWQiOiJteWFwcCIsImNvbnRleHQiOnt9LCJzY29wZSI6W3sicmVzb3VyY2UiOiJ0aWNrZXQiLCJhY3Rpb25zIjpbInJlYWQiLCJ3cml0ZSIsImRlbGV0ZSJdfSx7InJlc291cmNlIjoic2xhIiwiYWN0aW9ucyI6WyJyZWFkIiwid3JpdGUiLCJkZWxldGUiXX0seyJyZXNvdXJjZSI6InRyaWdnZXJzIiwiYWN0aW9ucyI6WyJyZWFkIiwid3JpdGUiLCJkZWxldGUiXX1dLCJpYXQiOjE0Njc5NzYxMjJ9.05YMBXY5PgTJZpY6qJA0YVgeXtND0aMiCU85fvOvDJc";*/
-var authorization;
+var redisHandler = require('../Workers/RedisHandler');
+var Q = require('q');
 
 var mongoip = config.Mongo.ip;
 var mongoport = config.Mongo.port;
@@ -73,6 +68,17 @@ mongoose.connection.once('open', function () {
 
 mongoose.connect(connectionstring);
 
+var validatePageActivity = function(ownerId){
+    var deferred = Q.defer();
+    redisHandler.GetOwnersList(tenantId,companyId).then(function(reply){
+        deferred.resolve((reply&&(reply.indexOf(ownerId.toString()) === -1)));
+    }).catch(function(err){
+        logger.err(err);
+        deferred.resolve(false);
+
+    });
+    return deferred.promise;
+};
 
 module.exports.GetFacebookAccounts = function (req, res) {
     logger.info("DVP-SocialConnector.GetFacebookAccounts Internal method ");
@@ -920,32 +926,59 @@ module.exports.RealTimeUpdates = function (fbData) {
 
         console.log(items);
 
-        var ownerIds = config.SocialConnector.owner_id.split(",");
+        /*var ownerIds = config.SocialConnector.owner_id.split(",");*/
 
         items.changes.forEach(function (change) {
-            /*if (change.value.sender_id.toString() === config.SocialConnector.owner_id){*/
-                if (change&&change.value&&change.value.from&&(ownerIds.indexOf(change.value.from.id.toString()) === -1)) {
+            try {
+                /*if (change.value.sender_id.toString() === config.SocialConnector.owner_id){*/
+
+                if (change&&change.value&&change.value.from) {
                     if (change.field == "feed") {
                         if (change.value.item == "status" || change.value.item == "post") {
                             // create ticket
-                            RealTimeCreateTicket(items.id, change.value);
+                            RealTimeCreateTicket(items.id, change.value,change.value.from.id.toString());
                         }
                         else if (change.value.item == "comment") {
                             // add comment
-                            RealTimeComments(items.id, change.value);
+                            RealTimeComments(items.id, change.value,change.value,change.value.from.id.toString());
                         }
                     }
 
                 }
                 else {
-                    console.log("Comment By Owner....................................");
+                    var jsonString = messageFormatter.FormatMessage(undefined, "Fail To Find From ID", false, undefined);
+                    logger.error(jsonString);
+                    console.log(jsonString);
                 }
+
+                /* if (change&&change.value&&change.value.from&&(ownerIds.indexOf(change.value.from.id.toString()) === -1)) {
+                     if (change.field == "feed") {
+                         if (change.value.item == "status" || change.value.item == "post") {
+                             // create ticket
+                             RealTimeCreateTicket(items.id, change.value);
+                         }
+                         else if (change.value.item == "comment") {
+                             // add comment
+                             RealTimeComments(items.id, change.value);
+                         }
+                     }
+
+                 }
+                 else {
+                     console.log("Comment By Owner....................................");
+                 }*/
+            }
+            catch(err){
+                var jsonString = messageFormatter.FormatMessage(err, "Operation Fail.", false, undefined);
+                logger.error(jsonString);
+            }
+
 
         });
     });
 };
 
-var RealTimeComments = function (id, fbData) {
+var RealTimeComments = function (id, fbData,ownerId) {
 
     var jsonString;
     SocialConnector.findOne({_id: id}, function (err, fbConnector) {
@@ -956,6 +989,11 @@ var RealTimeComments = function (id, fbData) {
         }
         else {
             if (fbConnector) {
+                if(id===ownerId){
+                    jsonString = messageFormatter.FormatMessage(undefined, "Changes Originate by Owner", false, undefined);
+                    logger.error(jsonString);
+                    return;
+                }
                 var company = parseInt(fbConnector.company);
                 var tenant = parseInt(fbConnector.tenant);
 
@@ -1005,7 +1043,7 @@ var RealTimeComments = function (id, fbData) {
 
 };
 
-var RealTimeCreateTicket = function (id, fbData) {
+var RealTimeCreateTicket = function (id, fbData,ownerId) {
 
 
     var jsonString;
@@ -1017,7 +1055,12 @@ var RealTimeCreateTicket = function (id, fbData) {
         }
         else {
             if (fbConnector) {
-
+                // Need create ticket for owner post. no facetone UI to facebook post
+                /*if(id===ownerId){
+                    jsonString = messageFormatter.FormatMessage(undefined, "Changes Originate by Owner", false, undefined);
+                    logger.error(jsonString);
+                    return;
+                }*/
                 var company = parseInt(fbConnector.company);
                 var tenant = parseInt(fbConnector.tenant);
 
@@ -1052,54 +1095,7 @@ var RealTimeCreateTicket = function (id, fbData) {
                             }
                         });
 
-                        /*
 
-                         var ticketData = {
-                         "type": "question",
-                         "subject": "Facebook Wall Post",
-                         "reference": fbData.id,
-                         "description": fbData.message,
-                         "priority": "normal",
-                         "status": "new",
-                         "requester": fbData.from.id,
-                         "engagement_session": engagement.engagement_id,
-                         "channel": JSON.stringify(from),
-                         "tags": ["facebook.post.common.common",name]
-
-
-                         };
-
-                         var ticketUrl = format("http://{0}/DVP/API/{1}/Ticket", config.Services.ticketServiceHost, config.Services.ticketServiceVersion);
-
-
-                         var options = {
-                         method: 'POST',
-                         uri: ticketUrl,
-                         headers: {
-                         Accept: 'application/json',
-                         authorization: "Bearer " + config.Services.accessToken,
-                         companyinfo: format("{0}:{1}", tenant, company)
-                         },
-                         json: ticketData
-                         };
-
-                         request(options, function (error, response, body) {
-
-                         console.log(response);
-                         if (response.statusCode == 200) {
-                         if(body.IsSuccess)
-                         jsonString = messageFormatter.FormatMessage(undefined, "Ticket Create Successfully.", true, undefined);
-                         else{
-                         jsonString = messageFormatter.FormatMessage(body.Exception, "Fail To Create Ticket.", false, undefined);
-                         }
-                         }
-                         else {
-                         jsonString = messageFormatter.FormatMessage(body, "Fail To Create Ticket.", false, undefined);
-                         }
-
-                         logger.info("FB Real  Rime Updates: " + jsonString);
-                         });
-                         */
                     }
                     else {
                         logger.error("Create engagement failed " + id);
