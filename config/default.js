@@ -176,10 +176,13 @@ module.exports = {
     //"owner_id":"124278164680278,124278164680845"
 
 
-    "fb_client_id":"1339841416135058",
-    "fb_client_secret":"21391d2aef1b811b53c11be90094bab6",
-    "owner_id":"891072687711352"
+   // "fb_client_id":"1339841416135058",
+   // "fb_client_secret":"21391d2aef1b811b53c11be90094bab6",
+   // "owner_id":"891072687711352"
 
+   "fb_client_id":"1653017581444883",
+   "fb_client_secret":"5af6508ad08ef57b13848a0836bfca40",
+    "owner_id":"891072687711352"
   }
 
 };
