@@ -24,8 +24,6 @@ var mongouser = config.Mongo.user;
 var mongopass = config.Mongo.password;
 var mongoreplicaset=config.Mongo.replicaset;
 
-
-var mongoose = require('mongoose');
 var connectionstring = '';
 mongoip = mongoip.split(',');
 if(util.isArray(mongoip)){
