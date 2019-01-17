@@ -51,7 +51,7 @@ if(util.isArray(mongoip)){
 }
 logger.info("connectionstring ...   "+connectionstring);
 
-mongoose.connection.on('error', function (err) {
+/*mongoose.connection.on('error', function (err) {
     logger.error(err);
 });
 
@@ -64,7 +64,7 @@ mongoose.connection.once('open', function () {
 });
 
 
-mongoose.connect(connectionstring);
+mongoose.connect(connectionstring);*/
 
 var validatePageActivity = function(ownerId){
     var deferred = Q.defer();
