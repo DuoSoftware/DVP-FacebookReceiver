@@ -1117,6 +1117,11 @@ var RealTimeCreateTicket = function (id, fbData,ownerId) {
                         }
                     });
                 }
+                else
+                {
+                    jsonString = messageFormatter.FormatMessage(err, "No Social Connector Settings found.", false, undefined);
+                    logger.error(jsonString);
+                }
             }
         });
     }
