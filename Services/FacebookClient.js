@@ -1026,7 +1026,7 @@ var RealTimeComments = function (id, fbData,ownerId) {
                 user.channel = 'facebook';
 
                 console.log("CreateEngagement");
-                CreateEngagement("facebook-post", company, tenant, fbData.from.name, to.name, "inbound", fbData.comment_id, fbData.message, user, fbData.from.id, to, function (isSuccess, engagement) {
+                CreateEngagement("facebook-comment", company, tenant, fbData.from.name, to.name, "inbound", fbData.comment_id, fbData.message, user, fbData.from.id, to, function (isSuccess, engagement) {
                     console.log("CreateEngagement ......" +isSuccess);
                     if (isSuccess) {
                         console.log("CreateEngagement-------------- " + JSON.stringify(fbData));
