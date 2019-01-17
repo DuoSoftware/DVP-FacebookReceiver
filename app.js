@@ -9,9 +9,9 @@ restify.CORS.ALLOW_HEADERS.push('authorization');
 // Setup some https server options
 
 var https_options = {
-   /* ca: fs.readFileSync('/etc/ssl/fb/COMODORSADomainValidationSecureServerCA.crt'),
-    key: fs.readFileSync('/etc/ssl/fb/SSL1.txt'),
-    certificate: fs.readFileSync('/etc/ssl/fb/STAR_duoworld_com.crt')*/
+    /* ca: fs.readFileSync('/etc/ssl/fb/COMODORSADomainValidationSecureServerCA.crt'),
+     key: fs.readFileSync('/etc/ssl/fb/SSL1.txt'),
+     certificate: fs.readFileSync('/etc/ssl/fb/STAR_duoworld_com.crt')*/
 };
 
 var https_server = restify.createServer(https_options);
@@ -53,7 +53,7 @@ var setup_server = function (server) {
         // Process the Facebook updates here
         //res.send(200);
         fb.RealTimeUpdates(req.body);
-
+        res.status(200);
         res.end();
 
     });
@@ -63,6 +63,6 @@ var setup_server = function (server) {
 // Now, setup both servers in one step
 setup_server(https_server);
 
-https_server.listen(4433, function () {
+https_server.listen(4455, function () {
     console.log('%s listening at %s', https_server.name, https_server.url);
 });
