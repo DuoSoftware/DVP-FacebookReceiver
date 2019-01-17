@@ -17,6 +17,7 @@ var util = require('util');
 var redisHandler = require('../Workers/RedisHandler');
 var Q = require('q');
 
+/*
 var mongoip = config.Mongo.ip;
 var mongoport = config.Mongo.port;
 var mongodb = config.Mongo.dbname;
@@ -24,6 +25,8 @@ var mongouser = config.Mongo.user;
 var mongopass = config.Mongo.password;
 var mongoreplicaset=config.Mongo.replicaset;
 
+
+var mongoose = require('mongoose');
 var connectionstring = '';
 mongoip = mongoip.split(',');
 if(util.isArray(mongoip)){
@@ -51,7 +54,7 @@ if(util.isArray(mongoip)){
 }
 logger.info("connectionstring ...   "+connectionstring);
 
-/*mongoose.connection.on('error', function (err) {
+mongoose.connection.on('error', function (err) {
     logger.error(err);
 });
 
@@ -64,7 +67,8 @@ mongoose.connection.once('open', function () {
 });
 
 
-mongoose.connect(connectionstring);*/
+mongoose.connect(connectionstring);
+*/
 
 var validatePageActivity = function(ownerId){
     var deferred = Q.defer();

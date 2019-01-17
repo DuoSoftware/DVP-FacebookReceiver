@@ -4,6 +4,7 @@ var authorization = require('dvp-common/Authentication/Authorization.js');
 var fb = require('./Services/FacebookClient');
 var token = config.Services.accessToken;
 var fs = require('fs');
+var mongomodels = require('dvp-mongomodels');
 
 restify.CORS.ALLOW_HEADERS.push('authorization');
 // Setup some https server options

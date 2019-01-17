@@ -9,7 +9,7 @@
     "config": "^1.21.0",
     "dustjs-linkedin": "^2.7.3",
     "dvp-common": "1.1.0",
-    "dvp-mongomodels": "^5.2.6",
+    "dvp-mongomodels": "5.1.5",
     "fbgraph": "^1.2.0",
     "form-data": "^2.2.0",
     "format": "^0.2.2",
