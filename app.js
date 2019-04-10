@@ -4,14 +4,16 @@ var authorization = require('dvp-common/Authentication/Authorization.js');
 var fb = require('./Services/FacebookClient');
 var token = config.Services.accessToken;
 var fs = require('fs');
+var bodyParser = require('body-parser');
+var ValidateWebhook = require('./Services/ValidateWebhook');
 
 restify.CORS.ALLOW_HEADERS.push('authorization');
 // Setup some https server options
 
 var https_options = {
-   /* ca: fs.readFileSync('/etc/ssl/fb/COMODORSADomainValidationSecureServerCA.crt'),
-    key: fs.readFileSync('/etc/ssl/fb/SSL1.txt'),
-    certificate: fs.readFileSync('/etc/ssl/fb/STAR_duoworld_com.crt')*/
+    /* ca: fs.readFileSync('/etc/ssl/fb/COMODORSADomainValidationSecureServerCA.crt'),
+     key: fs.readFileSync('/etc/ssl/fb/SSL1.txt'),
+     certificate: fs.readFileSync('/etc/ssl/fb/STAR_duoworld_com.crt')*/
 };
 
 var https_server = restify.createServer(https_options);
@@ -22,19 +24,20 @@ var https_server = restify.createServer(https_options);
 var setup_server = function (server) {
 
     server.pre(restify.pre.userAgentConnection());
-    server.use(restify.bodyParser({mapParams: false}));
+    //server.use(restify.bodyParser({mapParams: false}));
     server.use(restify.queryParser());
     server.use(restify.CORS());
     server.use(restify.fullResponse());
+    server.use(bodyParser.json({ verify: ValidateWebhook.verifyRequestSignature }));
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    server.get('/', function(req, res) {
+    server.get('/', function (req, res) {
         console.log(req);
         res.send('It works!');
     });
 
-    server.get('/facebook', function(req, res) {
+    server.get('/facebook', function (req, res) {
         if (
             req.params.hub.mode == 'subscribe' &&
             req.params.hub.verify_token == 'token'
@@ -47,7 +50,7 @@ var setup_server = function (server) {
         }
     });
 
-    server.post('/facebook', function(req, res) {
+    server.post('/facebook', function (req, res) {
         console.log('Facebook request body:');
         console.log(JSON.stringify(req.body));
         // Process the Facebook updates here

@@ -103,7 +103,7 @@ module.exports = {
 		
 		"ticketServiceHost": "SYS_LITETICKET_HOST",
         "ticketServicePort": "SYS_LITETICKET_PORT",
-        "ticketServicePort": "SYS_LITETICKET_VERSION",
+        "ticketServiceVersion": "SYS_LITETICKET_VERSION",
 		
 		"ardsServiceHost": "SYS_ARDSLITESERVICE_HOST",
 		"ardsServicePort": "SYS_ARDSLITESERVICE_PORT",
