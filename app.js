@@ -5,6 +5,7 @@ var fb = require('./Services/FacebookClient');
 var token = config.Services.accessToken;
 var fs = require('fs');
 var bodyParser = require('body-parser');
+var mongomodels = require('dvp-mongomodels');
 var ValidateWebhook = require('./Services/ValidateWebhook');
 
 restify.CORS.ALLOW_HEADERS.push('authorization');
@@ -56,7 +57,7 @@ var setup_server = function (server) {
         // Process the Facebook updates here
         //res.send(200);
         fb.RealTimeUpdates(req.body);
-
+        res.status(200);
         res.end();
 
     });
