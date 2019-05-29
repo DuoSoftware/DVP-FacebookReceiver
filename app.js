@@ -29,8 +29,14 @@ var setup_server = function (server) {
     server.use(restify.queryParser());
     server.use(restify.CORS());
     server.use(restify.fullResponse());
-    server.use(bodyParser.json({ verify: ValidateWebhook.verifyRequestSignature }));
-
+    //server.use(bodyParser.json({type: 'application/*+json', verify: ValidateWebhook.verifyRequestSignature }));
+    server.use(bodyParser.json({
+        type: function (req) {
+            if(req.headers['content-type'] !== 'application/json'){
+                req.headers['content-type'] = 'application/json';
+            }
+            return true;}, verify: ValidateWebhook.verifyRequestSignature
+    }));
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     server.get('/', function (req, res) {
