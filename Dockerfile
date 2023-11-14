@@ -7,11 +7,13 @@
 
 #EXPOSE 4648
 
-FROM node:9.9.0
+FROM node:10-alpine
 ARG VERSION_TAG
-RUN git clone -b $VERSION_TAG https://github.com/DuoSoftware/DVP-FacebookReceiver.git /usr/local/src/facebookreceiver
-RUN cd /usr/local/src/facebookreceiver;
+# RUN git clone -b $VERSION_TAG https://github.com/DuoSoftware/DVP-FacebookReceiver.git /usr/local/src/facebookreceiver
+# RUN cd /usr/local/src/facebookreceiver;
 WORKDIR /usr/local/src/facebookreceiver
+COPY package*.json ./
 RUN npm install
+COPY . .
 EXPOSE 4648
 CMD [ "node", "/usr/local/src/facebookreceiver/app.js" ]
