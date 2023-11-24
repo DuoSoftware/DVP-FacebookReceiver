@@ -195,6 +195,8 @@ function CreateEngagement(channel, company, tenant, from, to, direction, session
             engagementURL = format("http://{0}:{1}/DVP/API/{2}/EngagementSessionForProfile", config.Services.interactionurl, config.Services.interactionport, config.Services.interactionversion);
 
         var engagementData =  {
+            company: company,
+            tenant: tenant,
             engagement_id: session,
             channel: channel,
             direction: direction,
@@ -212,8 +214,8 @@ function CreateEngagement(channel, company, tenant, from, to, direction, session
             method: "POST",
             url: engagementURL,
             headers: {
-                authorization: "bearer "+config.Services.accessToken,
-                companyinfo: format("{0}:{1}", tenant, company)
+                authorization: "bearer "+config.Services.rAccessToken,
+                // companyinfo: format("{0}:{1}", tenant, company)
             },
             json: engagementData
         }, function (_error, _response, datax) {
@@ -243,7 +245,7 @@ function CreateEngagement(channel, company, tenant, from, to, direction, session
     }
 };
 
-function CreateTicket(channel,session,profile, company, tenant, type, subjecct, description, priority, tags, cb){
+function CreateTicket(channel,session,profile, company, tenant, type, subjecct, description, priority, tags, user, cb){
 
     if((config.Services && config.Services.ticketServiceHost && config.Services.ticketServicePort && config.Services.ticketServiceVersion)) {
 
@@ -253,7 +255,8 @@ function CreateTicket(channel,session,profile, company, tenant, type, subjecct, 
             ticketURL = format("http://{0}:{1}/DVP/API/{2}/Ticket", config.Services.ticketServiceHost, config.Services.ticketServicePort, config.Services.ticketServiceVersion);
 
         var ticketData =  {
-
+            "company": company,
+            "tenant": tenant,
             "type": type,
             "subject": subjecct,
             "reference": session,
@@ -264,13 +267,14 @@ function CreateTicket(channel,session,profile, company, tenant, type, subjecct, 
             "engagement_session": session,
             "channel": channel,
             "tags": tags,
+            "user":user
         };
 
         request({
             method: "POST",
             url: ticketURL,
             headers: {
-                authorization: "bearer "+config.Services.accessToken,
+                authorization: "bearer "+config.Services.rAccessToken,
                 companyinfo: format("{0}:{1}", tenant, company)
             },
             json: ticketData
@@ -442,7 +446,7 @@ function GetCallRule(company, tenant, ani, dnis, category,cb){
             method: "GET",
             url: callURL,
             headers: {
-                authorization: "bearer "+config.Services.accessToken,
+                authorization: "bearer "+config.Services.rAccessToken,
                 companyinfo: format("{0}:{1}", tenant, company)
             }
         }, function (_error, _response, datax) {

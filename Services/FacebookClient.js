@@ -1102,7 +1102,7 @@ var RealTimeCreateTicket = function (id, fbData,ownerId) {
                         if (isSuccess) {
 
                             //CreateTicket(channel,session,profile, company, tenant, type, subjecct, description, priority, tags, cb)
-                            CreateTicket("facebook-post", engagement.engagement_id, engagement.profile_id, company, tenant, "question", "Facebook Wall Post ", fbData.message, "normal", ["facebook.post.common.common"], function (done) {
+                            CreateTicket("facebook-post", engagement.engagement_id, engagement.profile_id, company, tenant, "question", "Facebook Wall Post ", fbData.message, "normal", ["facebook.post.common.common"],user, function (done) {
                                 if (done) {
                                     logger.info("Facebook Ticket Added successfully " + fbData.post_id);
 
