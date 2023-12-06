@@ -250,9 +250,9 @@ function CreateTicket(channel,session,profile, company, tenant, type, subjecct, 
     if((config.Services && config.Services.ticketServiceHost && config.Services.ticketServicePort && config.Services.ticketServiceVersion)) {
 
 
-        var ticketURL = format("http://{0}/DVP/API/{1}/Ticket", config.Services.ticketServiceHost, config.Services.ticketServiceVersion);
+        var ticketURL = format("http://{0}/DVP/API/{1}/facebookTicket", config.Services.ticketServiceHost, config.Services.ticketServiceVersion);
         if (validator.isIP(config.Services.ticketServiceHost))
-            ticketURL = format("http://{0}:{1}/DVP/API/{2}/Ticket", config.Services.ticketServiceHost, config.Services.ticketServicePort, config.Services.ticketServiceVersion);
+            ticketURL = format("http://{0}:{1}/DVP/API/{2}/facebookTicket", config.Services.ticketServiceHost, config.Services.ticketServicePort, config.Services.ticketServiceVersion);
 
         var ticketData =  {
             "company": company,
