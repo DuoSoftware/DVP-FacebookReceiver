@@ -35,7 +35,8 @@ var setup_server = function (server) {
             if(req.headers['content-type'] !== 'application/json'){
                 req.headers['content-type'] = 'application/json';
             }
-            return true;}, verify: ValidateWebhook.verifyRequestSignature
+            return true;}
+            // ,verify: ValidateWebhook.verifyRequestSignature
     }));
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

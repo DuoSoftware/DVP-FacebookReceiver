@@ -1453,15 +1453,19 @@ queueConnection.on('ready', function () {
             }
             ///////////////////////////create body/////////////////////////////////////////////////
 
-            MakeCommentsToWallPost(message.tenant,message.company,message.from,message.reply_session,message.body,message,ack)
+            MakeCommentsToWallPost(message.tenant,message.company,message.to,message.reply_session,message.body,message,ack)
         });
     });
 });
 
 function MakeCommentsToWallPost(tenant,company,connectorId,objectid,msg,data,ack) {
 
+    var id = data.reply_session.split("_")
+    console.log("id[0]");
+    console.log(id[0]);
+
     console.log("MakeCommentsToWallPost. RMQ Data >  " + JSON.stringify(data));
-    SocialConnector.findOne({'_id': connectorId, company: company, tenant: tenant}, function (err, user) {
+    SocialConnector.findOne({'_id': id[0], company: company, tenant: tenant}, function (err, user) {
 
         if (err) {
             logger.error("Fail To Find Social Connector.",err);
@@ -1513,7 +1517,7 @@ function MakeCommentsToWallPost(tenant,company,connectorId,objectid,msg,data,ack
                     ack.acknowledge();
                 }
                 else {
-                    if (response.statusCode == 200) {
+                    //if (response.statusCode == 200) {
 
                         /*CreateEngagement("facebook-post", company, tenant, fbData.sender_name, to.name, "inbound", fbData.comment_id, fbData.message, user, fbData.sender_id, to, function (isSuccess, engagement) {*/
                         CreateEngagement("facebook-post", company, tenant, data.author, data.to, "outbound", JSON.parse(body).id, data.body, undefined, data.from, data.to, function (isSuccess, engagement) {
@@ -1547,11 +1551,11 @@ function MakeCommentsToWallPost(tenant,company,connectorId,objectid,msg,data,ack
                         });
 
                         ack.acknowledge();
-                    }
-                    else {
-                        logger.error("Fail To Make Comment.",new Error("Fail To Make Comment"));
-                        ack.acknowledge();
-                    }
+                    // }
+                    // else {
+                    //     logger.error("Fail To Make Comment.",new Error("Fail To Make Comment"));
+                    //     ack.acknowledge();
+                    // }
 
                     console.log("MakeCommentsToWallPost..... > "+ JSON.stringify(body));
                 }
